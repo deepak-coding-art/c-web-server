@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <string.h>
-#include "../lib/request_line_parser.h"
+#include "../include/request_line_parser.h"
 
 void should_parse_method()
 {

@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-#include "../lib/request_processor.h"
-#include "../lib/server.h"
+#include "../include/request_processor.h"
+#include "../include/server.h"
 
 // Single CB method handles the routes
 

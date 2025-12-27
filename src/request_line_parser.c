@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "../lib/request_line_parser.h"
+#include "../include/request_line_parser.h"
 
 int parse_request_line(char *str, int length, RequestLine *out)
 {

@@ -1,4 +1,4 @@
-#include "../lib/utils.h"
+#include "../include/utils.h"
 #include <string.h>
 
 int match_method(Request *req, char *method)

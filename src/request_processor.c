@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-#include "../lib/request_processor.h"
-#include "../lib/request_line_parser.h"
+#include "../include/request_processor.h"
+#include "../include/request_line_parser.h"
 
 int handle_request_line(char *element_buffer, int current_index, RequestLine *request_line, char *reset_element_buffer, char *stop)
 {

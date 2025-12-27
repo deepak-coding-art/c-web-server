@@ -1,5 +1,5 @@
-#include "./lib/server.h"
-#include "./lib/response.h"
+#include "./include/server.h"
+#include "./include/response.h"
 
 // Single CB method handles the routes
 

@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <string.h>
-#include "../lib/response.h"
+#include "../include/response.h"
 
 void should_format_response_line_for_code()
 {

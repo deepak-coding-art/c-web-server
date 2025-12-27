@@ -1,6 +1,6 @@
 #ifndef SHARED_TYPES
 #define SHARED_TYPES
-#include "../lib/request_line_parser.h"
+#include "../include/request_line_parser.h"
 
 // query => ?id=3&age=4
 // body => json, form-data
