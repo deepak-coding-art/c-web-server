@@ -1,0 +1,1 @@
+gcc -g main.c $(find src -name '*.c') -o ./bin/test
