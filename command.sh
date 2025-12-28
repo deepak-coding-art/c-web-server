@@ -18,7 +18,10 @@ case "$1" in
     dev)
         build_debug && $DEBUG_BIN
         ;;
-    test_create_response_line)
-        gcc $C_FLAGS ./tests/test_request_line_parser.c ./src/parsers/request_line_parser.c -o $DEBUG_BIN && $DEBUG_BIN
+    test_request_line_parser)
+        gcc $C_FLAGS ./tests/parsers/test_request_line_parser.c ./src/parsers/request_line_parser.c -o $DEBUG_BIN && $DEBUG_BIN
+        ;;
+    test_header_parser)
+        gcc $C_FLAGS ./tests/parsers/test_header_parser.c ./src/parsers/header_parser.c -o $DEBUG_BIN && $DEBUG_BIN
         ;;
 esac
