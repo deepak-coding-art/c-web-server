@@ -1,4 +1,4 @@
-#include "../include/response.h"
+#include "response.h"
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>

@@ -1,6 +1,6 @@
 #ifndef UTILS_H
 #define UTILS_H
-#include "../include/shared_types.h"
+#include "request.h"
 
 int match_url(Request *req, char *url);
 

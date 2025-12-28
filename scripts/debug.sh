@@ -1,1 +1,1 @@
-gcc -g main.c $(find src -name '*.c') -o ./bin/test
+gcc -g -Iinclude main.c $(find src -name '*.c') -o ./bin/test

@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <stdlib.h>
-#include "../../include/utils.h"
+#include "utils/utils.h"
 
 void should_return_one_on_match()
 {
