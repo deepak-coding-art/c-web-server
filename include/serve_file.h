@@ -3,7 +3,7 @@
 #include "request.h"
 
 #define DEFAULT_PUBLIC_DER "../web"
-#define FILE_READ_BUFFER_SIZE 16
+#define FILE_READ_BUFFER_SIZE 128
 
 void http_serve_dir(int clinet_fd, char *root);
 
