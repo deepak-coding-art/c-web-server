@@ -2,6 +2,8 @@
 #include <string.h>
 #include "parsers/request_line_parser.h"
 
+#define DEBUG 0
+
 int parse_request_line(char *str, int length, RequestLine *out)
 {
     //  0 OK
@@ -86,8 +88,12 @@ int parse_request_line(char *str, int length, RequestLine *out)
     strcpy(out->method, method);
     strcpy(out->uri, uri);
     strcpy(out->version, version);
-    printf("Method: %s\n", out->method);
-    printf("URL: %s\n", out->uri);
-    printf("Version: %s\n", out->version);
+
+    if (DEBUG == 1)
+    {
+        printf("Method: %s\n", out->method);
+        printf("URL: %s\n", out->uri);
+        printf("Version: %s\n", out->version);
+    }
     return 0;
 }
