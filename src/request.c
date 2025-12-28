@@ -4,7 +4,7 @@
 #include <string.h>
 #include "request.h"
 
-int handle_request_line(char *element_buffer, int current_index, RequestLine *request_line, char *reset_element_buffer, char *stop)
+int handle_request_line(char *element_buffer, size_t current_index, RequestLine *request_line, char *reset_element_buffer, char *stop)
 {
     // return 1 to change state
     if (element_buffer[current_index] == '\n')
@@ -21,6 +21,7 @@ int handle_request_line(char *element_buffer, int current_index, RequestLine *re
                     printf("Malformed request line: %d\n", status);
                     *stop = 1;
                 }
+                *reset_element_buffer = 1;
                 return 1;
             }
         }
@@ -36,8 +37,32 @@ int handle_request_line(char *element_buffer, int current_index, RequestLine *re
     return 0;
 }
 
-void handle_header(char *element_buffer, int current_index, RequestLine *request_line, char *reset_element_buffer, char *stop)
+int handle_header(char *element_buffer, size_t current_index, Request *request, char *reset_element_buffer, char *stop)
 {
+    if (current_index < 3)
+        return 0;
+    if (
+        element_buffer[current_index - 3] == '\r' &&
+        element_buffer[current_index - 2] == '\n' &&
+        element_buffer[current_index - 1] == '\r' &&
+        element_buffer[current_index] == '\n')
+    {
+        if (current_index < 7)
+        {
+            *reset_element_buffer = 1;
+            return 1;
+        };
+        element_buffer[current_index - 1] = '\0';
+        int status = parse_headers(element_buffer, current_index, &(request->headers));
+        if (status < 0)
+        {
+            printf("Malformed headers: %d\n", status);
+            *stop = 1;
+        }
+        *reset_element_buffer = 1;
+        return 1;
+    }
+    return 0;
 }
 
 void process_request(int client_fd, CallBack fn)
@@ -50,7 +75,7 @@ void process_request(int client_fd, CallBack fn)
     char flag_parsing = 0;
 
     char element_buffer[ELEMENT_BUFFER_SIZE] = {0};
-    int element_buffer_current_index = 0;
+    size_t element_buffer_current_index = 0;
 
     char read_buffer[READ_BUFFER_SIZE] = {0};
     char read_bytes;
@@ -60,6 +85,7 @@ void process_request(int client_fd, CallBack fn)
             stop = 1;
         if (stop == 1)
             break;
+        // write(STDOUT_FILENO, read_buffer, read_bytes);
         for (int i = 0; i < read_bytes; i++)
         {
             char reset_element_buffer = 0;
@@ -67,28 +93,34 @@ void process_request(int client_fd, CallBack fn)
             switch (current_element_type)
             {
             case 'r':
-                int change_state = handle_request_line(element_buffer, element_buffer_current_index, &request_line, &reset_element_buffer, &stop);
-                if (change_state == 1)
+                int req_line_change_state = handle_request_line(element_buffer, element_buffer_current_index, &request_line, &reset_element_buffer, &stop);
+                if (req_line_change_state == 1)
                 {
                     strcpy(request.method, request_line.method);
                     strcpy(request.url, request_line.uri);
-                    fn(&request, client_fd);
                     current_element_type = 'h';
                 }
                 break;
             case 'h':
-                stop = 1;
-                // handle_header(element_buffer, element_buffer_current_index, &request_line, &reset_element_buffer, &stop);
+                int header_change_state = handle_header(element_buffer, element_buffer_current_index, &request, &reset_element_buffer, &stop);
+                if (header_change_state == 1)
+                {
+                    fn(&request, client_fd);
+                    current_element_type = 'b';
+                }
                 break;
             case 'b':
+                stop = 1; // {TODO} remove
                 break;
             default:
+                stop = 1;
                 break;
             }
             // Element Buffer
             if (reset_element_buffer == 1)
             {
                 element_buffer_current_index = 0;
+                element_buffer[element_buffer_current_index] = '\0';
             }
             else
             {

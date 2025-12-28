@@ -7,6 +7,13 @@
         "command": "gcc",
         "args": ["-g", "${file}", "-o", "${fileDirname}/bin/${fileBasenameNoExtension}"],
         "group": "build"
+      },
+      {
+        "label": "build-dev",
+        "type": "shell",
+        "command": "./command.sh",
+        "args": ["debug"],
+        "group": "build"
       }
     ]
   }

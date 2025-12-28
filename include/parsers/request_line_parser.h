@@ -12,6 +12,6 @@ typedef struct
     char version[VERSION_MAX_LENGTH]; // HTTP/1.1 for now
 } RequestLine;
 
-int parse_request_line(char *str, int length, RequestLine *out);
+int parse_request_line(char *str, size_t length, RequestLine *out);
 
 #endif

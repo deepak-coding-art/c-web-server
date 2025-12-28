@@ -4,7 +4,7 @@
 
 #define DEBUG 0
 
-int parse_request_line(char *str, int length, RequestLine *out)
+int parse_request_line(char *str, size_t length, RequestLine *out)
 {
     //  0 OK
     // -1 NULL input error
