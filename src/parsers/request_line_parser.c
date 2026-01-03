@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include "utils/utils.h"
 #include "parsers/request_line_parser.h"
 
 #define DEBUG 0
@@ -95,5 +96,8 @@ int parse_request_line(char *str, size_t length, RequestLine *out)
         printf("URL: %s\n", out->uri);
         printf("Version: %s\n", out->version);
     }
+    if (is_safe_uri(out->uri) == 0)
+        return -3;
+
     return 0;
 }

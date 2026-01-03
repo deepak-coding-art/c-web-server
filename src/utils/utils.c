@@ -40,3 +40,15 @@ int match_url(Request *req, char *url)
         return 0;
     }
 }
+
+int is_safe_uri(char *path)
+{
+    // return 1 ok 0 bad
+    if (strstr(path, "..") != NULL)
+        return 0;
+    if (strstr(path, "%2e%2e") != NULL)
+        return 0;
+    if (strstr(path, "%00") != NULL)
+        return 0;
+    return 1;
+}

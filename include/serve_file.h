@@ -5,8 +5,8 @@
 #define DEFAULT_PUBLIC_DER "../web"
 #define FILE_READ_BUFFER_SIZE 128
 
-void http_serve_dir(int clinet_fd, char *root);
+void http_serve_dir(int client_fd, char *root);
 
-void http_serve_file(Request *req, int clinet_fd);
+void http_serve_file(Request *req, int client_fd);
 
 #endif

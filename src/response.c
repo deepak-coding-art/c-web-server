@@ -3,14 +3,14 @@
 #include <string.h>
 #include <stdio.h>
 
-int write_headers(int clinet_fd, Headers headers)
+int write_headers(int client_fd, Headers headers)
 {
     char header_buffer[MAX_HEADERS * sizeof(Header)] = {0};
     headers_to_buffer(headers, header_buffer, sizeof(header_buffer));
     int header_buffer_len = strlen(header_buffer);
     snprintf(header_buffer + header_buffer_len, sizeof(header_buffer) - header_buffer_len, "\r\n");
     header_buffer_len = strlen(header_buffer);
-    ssize_t written_header_bytes = write(clinet_fd, header_buffer, header_buffer_len);
+    ssize_t written_header_bytes = write(client_fd, header_buffer, header_buffer_len);
     if (written_header_bytes < 1)
     {
         printf("Failed to write response headers: %ld\n", (long)written_header_bytes);
@@ -19,12 +19,12 @@ int write_headers(int clinet_fd, Headers headers)
     return 0;
 }
 
-int write_response_line(int clinet_fd, HttpStatus code)
+int write_response_line(int client_fd, HttpStatus code)
 {
     char response_line_buffer[40] = {0};
     create_response_line(code, response_line_buffer, sizeof(response_line_buffer));
     int length = strlen(response_line_buffer);
-    ssize_t written_bytes = write(clinet_fd, response_line_buffer, length);
+    ssize_t written_bytes = write(client_fd, response_line_buffer, length);
     if (written_bytes < 1)
     {
         printf("Failed to write response line: %ld\n", (long)written_bytes);
@@ -59,19 +59,35 @@ void create_response_line(HttpStatus code, char *buffer, size_t size)
 
 int http_response(int client_fd, HttpStatus res_code, char *message)
 {
-    char response_line[128] = {0};
-    create_response_line(res_code, response_line, sizeof(response_line));
-    char response_buffer[1024] = {0};
-    size_t buffer_size = sizeof(response_buffer);
-    snprintf(response_buffer, buffer_size, "%s\r\n%s", response_line, message);
-    int length = strlen(response_buffer);
-    if (buffer_size < length)
-    {
-        length = (int)buffer_size;
-    }
-    int written = write(client_fd, response_buffer, length);
+    int response_line_status = write_response_line(client_fd, res_code);
+    if (response_line_status < 0)
+        return -1;
+    int message_length = strlen(message);
+    char content_length_str[128] = {0};
+    snprintf(content_length_str, sizeof(content_length_str), "%d", message_length);
+    Headers headers = {0};
+    add_header("Content-Type", "text/html", &headers);
+    add_header("Content-Length", content_length_str, &headers);
+    int header_status = write_headers(client_fd, headers);
+    if (header_status < 0)
+        return -1;
+    int written = write(client_fd, message, message_length);
     if (written < 0)
     {
         perror("Failed to write to client");
     }
+}
+
+int write_not_found(int client_fd)
+{
+    int status = http_response(client_fd, STATUS_NOT_FOUND, "Not Found\n");
+    if (status < 0)
+        return -1;
+}
+
+int write_bad_req(int client_fd)
+{
+    int status = http_response(client_fd, STATUS_BAD_REQ, "Bad Request\n");
+    if (status < 0)
+        return -1;
 }

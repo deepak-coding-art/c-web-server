@@ -17,7 +17,7 @@ void call_back(Request *req, int client_fd)
 {
     if (match_url(req, "/api"))
     {
-        http_response(client_fd, STATUS_OK, "Hello World");
+        http_response(client_fd, STATUS_OK, "Hello World\n");
     }
     http_serve_file(req, client_fd);
 }

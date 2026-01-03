@@ -3,8 +3,9 @@
 #include <unistd.h>
 #include <string.h>
 #include "request.h"
+#include "response.h"
 
-int handle_request_line(char *element_buffer, size_t current_index, RequestLine *request_line, char *reset_element_buffer, char *stop)
+int handle_request_line(char *element_buffer, size_t current_index, RequestLine *request_line, char *reset_element_buffer, char *bad_request)
 {
     // return 1 to change state
     if (element_buffer[current_index] == '\n')
@@ -19,7 +20,7 @@ int handle_request_line(char *element_buffer, size_t current_index, RequestLine 
                 if (status < 0)
                 {
                     printf("Malformed request line: %d\n", status);
-                    *stop = 1;
+                    *bad_request = 1;
                 }
                 *reset_element_buffer = 1;
                 return 1;
@@ -28,7 +29,7 @@ int handle_request_line(char *element_buffer, size_t current_index, RequestLine 
         else
         {
             printf("Malformed request line\n");
-            *stop = 1;
+            *bad_request = 1;
         }
 
         // Reset
@@ -37,7 +38,7 @@ int handle_request_line(char *element_buffer, size_t current_index, RequestLine 
     return 0;
 }
 
-int handle_header(char *element_buffer, size_t current_index, Request *request, char *reset_element_buffer, char *stop)
+int handle_header(char *element_buffer, size_t current_index, Request *request, char *reset_element_buffer, char *bad_request)
 {
     if (current_index < 3)
         return 0;
@@ -57,7 +58,7 @@ int handle_header(char *element_buffer, size_t current_index, Request *request, 
         if (status < 0)
         {
             printf("Malformed headers: %d\n", status);
-            *stop = 1;
+            *bad_request = 1;
         }
         *reset_element_buffer = 1;
         return 1;
@@ -68,6 +69,7 @@ int handle_header(char *element_buffer, size_t current_index, Request *request, 
 void process_request(int client_fd, CallBack fn)
 {
     char stop = 0;
+    char bad_request = 0;
 
     Request request = {0};
     RequestLine request_line = {0};
@@ -82,7 +84,12 @@ void process_request(int client_fd, CallBack fn)
     while ((read_bytes = read(client_fd, &read_buffer, sizeof(read_buffer))) > 0)
     {
         if (element_buffer_current_index >= ELEMENT_BUFFER_SIZE)
-            stop = 1;
+            bad_request = 1;
+        if (bad_request == 1)
+        {
+            int status = write_bad_req(client_fd);
+            break;
+        }
         if (stop == 1)
             break;
         // write(STDOUT_FILENO, read_buffer, read_bytes);
@@ -93,7 +100,7 @@ void process_request(int client_fd, CallBack fn)
             switch (current_element_type)
             {
             case 'r':
-                int req_line_change_state = handle_request_line(element_buffer, element_buffer_current_index, &request_line, &reset_element_buffer, &stop);
+                int req_line_change_state = handle_request_line(element_buffer, element_buffer_current_index, &request_line, &reset_element_buffer, &bad_request);
                 if (req_line_change_state == 1)
                 {
                     strcpy(request.method, request_line.method);
@@ -102,7 +109,7 @@ void process_request(int client_fd, CallBack fn)
                 }
                 break;
             case 'h':
-                int header_change_state = handle_header(element_buffer, element_buffer_current_index, &request, &reset_element_buffer, &stop);
+                int header_change_state = handle_header(element_buffer, element_buffer_current_index, &request, &reset_element_buffer, &bad_request);
                 if (header_change_state == 1)
                 {
                     fn(&request, client_fd);
