@@ -1,4 +1,5 @@
 #include "utils/http_things.h"
+#include "string.h"
 
 const char *method_to_string(HttpMethod m)
 {

@@ -27,4 +27,7 @@ case "$1" in
     test_is_safe_uri)
         gcc $C_FLAGS ./tests/utils/test_is_safe_uri.c ./src/utils/utils.c -o $DEBUG_BIN && $DEBUG_BIN
         ;;
+    test_extract_file_ext)
+        gcc $C_FLAGS ./tests/utils/test_extract_file_ext.c ./src/utils/utils.c -o $DEBUG_BIN && $DEBUG_BIN
+        ;;
 esac

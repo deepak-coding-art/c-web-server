@@ -9,4 +9,6 @@ void http_serve_dir(int client_fd, char *root);
 
 void http_serve_file(Request *req, int client_fd);
 
+int dir_has_index_html(char *path);
+
 #endif
