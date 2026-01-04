@@ -7,6 +7,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include "logger.h"
 
 int dir_has_index_html(char *path)
 {
@@ -29,7 +30,6 @@ int dir_has_index_html(char *path)
 
 void serve_file(char *file_path, int client_fd, int file_fd)
 {
-    printf("REQ URI: %S\n", file_path);
     int response_line_status = write_response_line(client_fd, STATUS_OK);
     if (response_line_status == -1)
         return;
@@ -49,32 +49,32 @@ void serve_file(char *file_path, int client_fd, int file_fd)
         ssize_t written_bytes = write(client_fd, chunk_size_buf, buff_len);
         if (written_bytes < 1)
         {
-            printf("Failed to write response: %ld\n", (long)written_bytes);
+            log_message(LOG_ERROR, "Failed to write response: %ld", (long)written_bytes);
         }
 
         written_bytes = write(client_fd, read_buffer, read_bytes);
         if (written_bytes < 1)
         {
-            printf("Failed to write response: %ld\n", (long)written_bytes);
+            log_message(LOG_ERROR, "Failed to write response: %ld", (long)written_bytes);
         }
 
         written_bytes = write(client_fd, "\r\n", 2);
         if (written_bytes < 1)
         {
-            printf("Failed to write response: %ld\n", (long)written_bytes);
+            log_message(LOG_ERROR, "Failed to write response: %ld", (long)written_bytes);
         }
     }
     ssize_t written_bytes = write(client_fd, "0\r\n\r\n", 5);
     if (written_bytes < 1)
     {
-        printf("Failed to write response: %ld\n", (long)written_bytes);
+        log_message(LOG_ERROR, "Failed to write response: %ld", (long)written_bytes);
     }
 }
 
 void http_serve_file(Request *req, int client_fd)
 {
     struct stat st;
-    printf("File from %s\n", req->url);
+    log_message(LOG_DEBUG, "File from %s", req->url);
     char file_path[URI_MAX_LENGTH] = {0};
     int file_path_buffer_size = sizeof(file_path);
 

@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include "logger.h"
 
 int write_headers(int client_fd, Headers headers)
 {
@@ -13,7 +14,7 @@ int write_headers(int client_fd, Headers headers)
     ssize_t written_header_bytes = write(client_fd, header_buffer, header_buffer_len);
     if (written_header_bytes < 1)
     {
-        printf("Failed to write response headers: %ld\n", (long)written_header_bytes);
+        log_message(LOG_ERROR, "Failed to write response headers: %ld", (long)written_header_bytes);
         return -1;
     }
     return 0;
@@ -27,7 +28,7 @@ int write_response_line(int client_fd, HttpStatus code)
     ssize_t written_bytes = write(client_fd, response_line_buffer, length);
     if (written_bytes < 1)
     {
-        printf("Failed to write response line: %ld\n", (long)written_bytes);
+        log_message(LOG_ERROR, "Failed to write response line: %ld", (long)written_bytes);
         return -1;
     }
     return 0;

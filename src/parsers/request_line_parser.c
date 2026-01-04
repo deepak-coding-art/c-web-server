@@ -2,8 +2,7 @@
 #include <string.h>
 #include "utils/utils.h"
 #include "parsers/request_line_parser.h"
-
-#define DEBUG 0
+#include "logger.h"
 
 int parse_request_line(char *str, size_t length, RequestLine *out)
 {
@@ -90,12 +89,10 @@ int parse_request_line(char *str, size_t length, RequestLine *out)
     strcpy(out->uri, uri);
     strcpy(out->version, version);
 
-    if (DEBUG == 1)
-    {
-        printf("Method: %s\n", out->method);
-        printf("URL: %s\n", out->uri);
-        printf("Version: %s\n", out->version);
-    }
+    log_message(LOG_DEBUG, "Method: %s", out->method);
+    log_message(LOG_DEBUG, "URL: %s", out->uri);
+    log_message(LOG_DEBUG, "Version: %s", out->version);
+
     if (is_safe_uri(out->uri) == 0)
         return -3;
 

@@ -4,6 +4,7 @@
 #include <string.h>
 #include "request.h"
 #include "response.h"
+#include "logger.h"
 
 int handle_request_line(char *element_buffer, size_t current_index, RequestLine *request_line, char *reset_element_buffer, char *bad_request)
 {
@@ -19,7 +20,7 @@ int handle_request_line(char *element_buffer, size_t current_index, RequestLine 
                 int status = parse_request_line(element_buffer, current_index, request_line);
                 if (status < 0)
                 {
-                    printf("Malformed request line: %d\n", status);
+                    log_message(LOG_WARNING, "Malformed request line: %d", status);
                     *bad_request = 1;
                 }
                 *reset_element_buffer = 1;
@@ -28,7 +29,7 @@ int handle_request_line(char *element_buffer, size_t current_index, RequestLine 
         }
         else
         {
-            printf("Malformed request line\n");
+            log_message(LOG_WARNING, "Malformed request line");
             *bad_request = 1;
         }
 
@@ -57,7 +58,7 @@ int handle_header(char *element_buffer, size_t current_index, Request *request, 
         int status = parse_headers(element_buffer, current_index, &(request->headers));
         if (status < 0)
         {
-            printf("Malformed headers: %d\n", status);
+            log_message(LOG_WARNING, "Malformed headers: %d", status);
             *bad_request = 1;
         }
         *reset_element_buffer = 1;

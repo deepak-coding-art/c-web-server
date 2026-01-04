@@ -15,6 +15,7 @@
 
 void call_back(Request *req, int client_fd)
 {
+    log_message(LOG_DEBUG, "URL: %s", req->url);
     if (match_url(req, "/api"))
     {
         http_response(client_fd, STATUS_OK, "Hello World\n");

@@ -4,6 +4,7 @@
 #include "response.h"
 #include "serve_file.h"
 #include "utils/utils.h"
+#include "logger.h"
 
 int start_server(int port, CallBack fn);
 
